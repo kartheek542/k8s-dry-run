@@ -11,7 +11,7 @@ jobs:
     outputs:
       DOCKER_HOST_IP: ${{ steps.tf-outputs.outputs.DOCKER_HOST_IP }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: Checkout repository
         with:
           ref: kar/dev
@@ -67,7 +67,7 @@ jobs:
           - recommendationservice
           - shippingservice
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: Checkout repository
         with:
           ref: kar/dev
@@ -86,7 +86,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: Checkout repository
         with:
           ref: kar/dev
