@@ -14,16 +14,6 @@ jobs:
         with:
           ref: kar/dev
           path: k8s-dry-run
-      - name: Debug OIDC Token Claims
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const token = await core.getIDToken('sts.amazonaws.com');
-            const payload = token.split('.')[1];
-            // Decode the base64 payload of the JWT
-            const decoded = Buffer.from(payload, 'base64').toString('utf8');
-            console.log("=== EXACT CLAIMS GITHUB IS SENDING TO AWS ===");
-            console.log(JSON.stringify(JSON.parse(decoded), null, 2));
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
