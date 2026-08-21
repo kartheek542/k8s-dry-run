@@ -47,6 +47,9 @@ jobs:
           set -x
           echo "DOCKER_HOST_IP=$(terraform output -raw build_host_ip)" >> $GITHUB_OUTPUT
         working-directory: k8s-dry-run/terraform/docker-host
+      - name: Sleeping 60 seconds for startup script to complete
+        run: |
+          sleep 60
 
   build-and-archive-image:
     needs: setup-docker-host
@@ -67,17 +70,20 @@ jobs:
           - recommendationservice
           - shippingservice
     steps:
-      # - uses: actions/checkout@v7
-      #   name: Checkout repository
-      #   with:
-      #     ref: kar/dev
-      #     path: k8s-dry-run
+      - uses: actions/checkout@v7
+        name: Checkout repository
+        with:
+          ref: kar/dev
+          path: k8s-dry-run
       - name: Build and archive Docker image
         env:
           DOCKER_HOST: tcp://${{ needs.setup-docker-host.outputs.DOCKER_HOST_IP }}:2375
+        working-directory: k8s-dry-run/src/${{ matrix.service }}
         run: |
           echo "Building Docker image for service: ${{ matrix.service }}"
-          echo "DOCKER_HOST: $DOCKER_HOST"
+          echo "Checking connection to Docker host..."
+          docker info
+          docker build -t ${{ matrix.service }}:v${{ github.run_number }} .
 
   destroy-docker-host:
     needs: build-and-archive-image
@@ -96,14 +102,14 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::303417979872:role/github-oidc-admin-role
           aws-region: ap-south-1
-      # - uses: hashicorp/setup-terraform@v3
-      #   with:
-      #     terraform_version: 1.9.0
-      # - name: Initialize and validate terraform
-      #   run: |
-      #     terraform init
-      #     terraform validate
-      #   working-directory: k8s-dry-run/terraform/docker-host
-      # - name: Destroy infrastructure
-      #   run: terraform destroy -auto-approve
-      #   working-directory: k8s-dry-run/terraform/docker-host
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+      - name: Initialize and validate terraform
+        run: |
+          terraform init
+          terraform validate
+        working-directory: k8s-dry-run/terraform/docker-host
+      - name: Destroy infrastructure
+        run: terraform destroy -auto-approve
+        working-directory: k8s-dry-run/terraform/docker-host
