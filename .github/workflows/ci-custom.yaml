@@ -41,6 +41,7 @@ jobs:
           name: ec2-build-host-key
           path: build_host_key.pem
           retention-days: 1
+        working-directory: k8s-dry-run/terraform/docker-host
       - name: Save container host IP
         id: tf-outputs
         run: |
