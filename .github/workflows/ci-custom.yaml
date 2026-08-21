@@ -3,8 +3,19 @@ run-name: Building and deploying Sample Application
 on:
   workflow_dispatch:
 jobs:
-  validate-inputs:
+  setup-docker-host:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - name: Hello World
-        run: echo "Hello World"
+      - uses: actions/checkout@v4
+        name: Checkout repository
+        with:
+          ref: kar/dev
+          path: k8s-dry-run
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::303417979872:role/github-oidc-admin-role
+          aws-region: ap-south-1
