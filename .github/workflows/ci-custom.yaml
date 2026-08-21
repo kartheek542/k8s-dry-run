@@ -30,8 +30,17 @@ jobs:
           terraform validate
         working-directory: k8s-dry-run/terraform/docker-host
       - name: Provision infrastructure
-        run: terraform plan && terraform apply -auto-approve
+        run: |
+          terraform plan && terraform apply -auto-approve
+          terraform output -raw build_host_private_key > build_host_key.pem
+          chmod 400 build_host_key.pem
         working-directory: k8s-dry-run/terraform/docker-host
+      - name: Archive Private Key as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ec2-build-host-key
+          path: build_host_key.pem
+          retention-days: 1
       - name: Save container host IP
         id: tf-outputs
         run: |
@@ -87,14 +96,14 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::303417979872:role/github-oidc-admin-role
           aws-region: ap-south-1
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.9.0
-      - name: Initialize and validate terraform
-        run: |
-          terraform init
-          terraform validate
-        working-directory: k8s-dry-run/terraform/docker-host
-      - name: Destroy infrastructure
-        run: terraform destroy -auto-approve
-        working-directory: k8s-dry-run/terraform/docker-host
+      # - uses: hashicorp/setup-terraform@v3
+      #   with:
+      #     terraform_version: 1.9.0
+      # - name: Initialize and validate terraform
+      #   run: |
+      #     terraform init
+      #     terraform validate
+      #   working-directory: k8s-dry-run/terraform/docker-host
+      # - name: Destroy infrastructure
+      #   run: terraform destroy -auto-approve
+      #   working-directory: k8s-dry-run/terraform/docker-host
