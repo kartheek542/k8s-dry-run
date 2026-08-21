@@ -67,11 +67,11 @@ jobs:
           - recommendationservice
           - shippingservice
     steps:
-      - uses: actions/checkout@v7
-        name: Checkout repository
-        with:
-          ref: kar/dev
-          path: k8s-dry-run
+      # - uses: actions/checkout@v7
+      #   name: Checkout repository
+      #   with:
+      #     ref: kar/dev
+      #     path: k8s-dry-run
       - name: Build and archive Docker image
         env:
           DOCKER_HOST: tcp://${{ needs.setup-docker-host.outputs.DOCKER_HOST_IP }}:2375
