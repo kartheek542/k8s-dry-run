@@ -3,16 +3,17 @@ run-name: Building and deploying Sample Application
 on:
   workflow_dispatch:
 jobs:
-  validate-inputs:
+  setup-docker-host:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
         name: Checkout repository
         with:
-          # repository: 'meatdrop/meatdrop-ui'
-          # token: ${{ secrets.CI_GITHUB_TOKEN }}
           ref: kar/dev
-          path: meatdrop-ui
+          path: k8s-dry-run
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
