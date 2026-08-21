@@ -96,14 +96,14 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::303417979872:role/github-oidc-admin-role
           aws-region: ap-south-1
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.9.0
-      - name: Initialize and validate terraform
-        run: |
-          terraform init
-          terraform validate
-        working-directory: k8s-dry-run/terraform/docker-host
-      - name: Destroy infrastructure
-        run: terraform destroy -auto-approve
-        working-directory: k8s-dry-run/terraform/docker-host
+      # - uses: hashicorp/setup-terraform@v3
+      #   with:
+      #     terraform_version: 1.9.0
+      # - name: Initialize and validate terraform
+      #   run: |
+      #     terraform init
+      #     terraform validate
+      #   working-directory: k8s-dry-run/terraform/docker-host
+      # - name: Destroy infrastructure
+      #   run: terraform destroy -auto-approve
+      #   working-directory: k8s-dry-run/terraform/docker-host
