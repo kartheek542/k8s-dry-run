@@ -61,14 +61,15 @@ jobs:
           - adservice
           - cartservice
           - checkoutservice
+          - currencyservice
           - emailservice
           - frontend
           - loadgenerator
           - paymentservice
-          - pdbservice
           - productcatalogservice
           - recommendationservice
           - shippingservice
+          - shoppingassistantservice
     steps:
       - uses: actions/checkout@v7
         name: Checkout repository
