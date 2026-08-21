@@ -83,7 +83,13 @@ jobs:
           echo "Building Docker image for service: ${{ matrix.service }}"
           echo "Checking connection to Docker host..."
           docker info
-          docker build -t ${{ matrix.service }}:v${{ github.run_number }} .
+          if [[ ${{ matrix.service }} == "cartservice" ]]; then
+            cd src
+            docker build -t ${{ matrix.service }}:v${{ github.run_number }} .
+            cd ..
+          else
+            docker build -t ${{ matrix.service }}:v${{ github.run_number }} .
+          fi
 
   destroy-docker-host:
     needs: build-and-archive-image
