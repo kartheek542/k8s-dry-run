@@ -19,3 +19,75 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::303417979872:role/github-oidc-admin-role
           aws-region: ap-south-1
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+      - name: Initialize and validate terraform
+        run: |
+          terraform init
+          terraform validate
+        working-directory: k8s-dry-run/terraform/docker-host
+      - name: Provision infrastructure
+        run: terraform plan && terraform apply -auto-approve
+        working-directory: k8s-dry-run/terraform/docker-host
+      - name: Save container host IP
+        run: |
+          echo "DOCKER_HOST_IP=$(terraform output -raw build_host_ip)" >> $GITHUB_OUTPUT
+        working-directory: k8s-dry-run/terraform/docker-host
+
+  build-and-archive-image:
+    needs: setup-docker-host
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 3
+      matrix:
+        service:
+          - adservice
+          - cartservice
+          - checkoutservice
+          - emailservice
+          - frontend
+          - loadgenerator
+          - paymentservice
+          - pdbservice
+          - productcatalogservice
+          - recommendationservice
+          - shippingservice
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout repository
+        with:
+          ref: kar/dev
+          path: k8s-dry-run
+      - name: Build and archive Docker image
+        env:
+          DOCKER_HOST: tcp://${{ needs.setup-docker-host.outputs.DOCKER_HOST_IP }}:2375
+        run: |
+          echo "Building Docker image for service: ${{ matrix.service }}"
+          echo "DOCKER_HOST: $DOCKER_HOST"
+
+  destroy-docker-host:
+    needs: build-and-archive-image
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout repository
+        with:
+          ref: kar/dev
+          path: k8s-dry-run
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::303417979872:role/github-oidc-admin-role
+          aws-region: ap-south-1
+      - name: Initialize and validate terraform
+        run: |
+          terraform init
+          terraform validate
+        working-directory: k8s-dry-run/terraform/docker-host
+      - name: Destroy infrastructure
+        run: terraform destroy -auto-approve
+        working-directory: k8s-dry-run/terraform/docker-host
