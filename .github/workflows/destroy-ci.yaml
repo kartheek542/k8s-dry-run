@@ -5,6 +5,9 @@ on:
 jobs:
   validate-inputs:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Hello World
         run: echo "Hello World"
