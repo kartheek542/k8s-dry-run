@@ -1,0 +1,10 @@
+name: CI - Build and Deploy Sample Application
+run-name: Building and deploying Sample Application
+on:
+  workflow_dispatch:
+jobs:
+  validate-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hello World
+        run: echo "Hello World"
