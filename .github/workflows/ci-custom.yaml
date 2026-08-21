@@ -1,0 +1,20 @@
+name: CI - Build and Deploy Sample Application
+run-name: Building and deploying Sample Application
+on:
+  workflow_dispatch:
+jobs:
+  validate-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout repository
+        with:
+          # repository: 'meatdrop/meatdrop-ui'
+          # token: ${{ secrets.CI_GITHUB_TOKEN }}
+          ref: kar/dev
+          path: meatdrop-ui
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::303417979872:role/github-oidc-admin-role
+          aws-region: ap-south-1
